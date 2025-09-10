@@ -1,33 +1,36 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
-#, render_template, request, redirect, url_for
-# import sqlite3
+#, render_template, , redirect, url_for
+
+import sqlite3
 
 # remember to $ pip install flask
 
 app = Flask(__name__)
 
-pet_data = [
-    {
-        "name":"dorothy",
-        "kind":"dog",
-        "food":"dogfood",
-        "noise":"arf"
-    },
-    {
-        "name":"sandy",
-        "kind":"cat",
-        "food":"catfood",
-        "noise":"meow"
-    },
-    {
-        "name":"clarabelle",
-        "kind":"cow",
-        "food":"hay",
-        "noise":"moo"
-    },
+connection = sqlite3.connect("pets.db", check_same_thread=False)
 
-]
+# pet_data = [
+#     {
+#         "name":"dorothy",
+#         "kind":"dog",
+#         "food":"dogfood",
+#         "noise":"arf"
+#     },
+#     {
+#         "name":"sandy",
+#         "kind":"cat",
+#         "food":"catfood",
+#         "noise":"meow"
+#     },
+#     {
+#         "name":"clarabelle",
+#         "kind":"cow",
+#         "food":"hay",
+#         "noise":"moo"
+#     },
+
+# ]
 
 @app.route("/", methods=["GET"])
 def get_index():
@@ -45,10 +48,36 @@ def get_hi(name="guest"):
 
 @app.route("/pets",methods=["GET"])
 def get_pets():
-    global pet_data
-    data = pet_data
-    return render_template("pets.html", data=data)
+    cursor = connection.cursor()
+    rows = cursor.execute("select * from pet").fetchall()
+    pet_data = [
+        {
+            "id":str(id),
+            "name":name,
+            "kind":kind,
+            "noise":noise,
+            "food":food
+        }
+        for id, name, kind, noise, food in rows
+    ]
+    return render_template("pets.html", data=pet_data)
 
+@app.route("/create", methods=["GET"])
+def get_create():
+    return render_template("create.html")
+
+@app.route("/create", methods=["POST"])
+def post_create():
+    name = request.form.get("name")
+    kind = request.form.get("kind")
+    noise = request.form.get("noise")
+    food = request.form.get("food")
+
+    cursor = connection.cursor()
+    cursor.execute("insert into pet (name, kind, noise, food) values (?, ?, ?, ?)", (name, kind, noise, food))
+    connection.commit()
+
+    return redirect(url_for("get_pets"))
 
 @app.route("/data", methods=["GET"])
 def get_data():
