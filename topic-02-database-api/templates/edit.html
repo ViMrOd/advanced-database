@@ -9,15 +9,15 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
     <body>
-        <h1>Create a Pet</h1>
-        <form action="/create" method="post">
+        <h2>Edit a Pet</h2>
+        <form action="/edit/{{ pet.id }}" method="post">
             <hr/>
-            <p>Animal Name:<input name="name"/></p>
-            <p>Kind:<input name="kind"/></p>
-            <p>Noise:<input name="noise"/></p>
-            <p>Food:<input name="food"/></p>
+            <p>Animal Name:<input name="name" value="{{ pet.name }}"/></p>
+            <p>Kind:<input name="kind" value="{{ pet.kind }}"/></p>
+            <p>Noise:<input name="noise" value="{{ pet.noise }}"/></p>
+            <p>Food:<input name="food" value="{{ pet.food }}"/></p>
             <hr/>
-            <button type="submit">Create</button>
+            <button type="submit">Save</button>
             <a href="/pets">Cancel</a>
             <hr/>
         </form>

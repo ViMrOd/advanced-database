@@ -1,6 +1,4 @@
-from flask import Flask, render_template, request
-
-#, render_template, , redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for
 
 import sqlite3
 
@@ -10,42 +8,7 @@ app = Flask(__name__)
 
 connection = sqlite3.connect("pets.db", check_same_thread=False)
 
-# pet_data = [
-#     {
-#         "name":"dorothy",
-#         "kind":"dog",
-#         "food":"dogfood",
-#         "noise":"arf"
-#     },
-#     {
-#         "name":"sandy",
-#         "kind":"cat",
-#         "food":"catfood",
-#         "noise":"meow"
-#     },
-#     {
-#         "name":"clarabelle",
-#         "kind":"cow",
-#         "food":"hay",
-#         "noise":"moo"
-#     },
-
-# ]
-
 @app.route("/", methods=["GET"])
-def get_index():
-    return render_template("index.html", item={
-        "name":"Greg",
-        "title":"Dr."
-    }, count=10)
-
-@app.route("/hi/<name>", methods=["GET"])
-@app.route("/hi", methods=["GET"])
-def get_hi(name="guest"):
-    return render_template("index.html", item={
-        "name":name
-    }, count=1)
-
 @app.route("/pets",methods=["GET"])
 def get_pets():
     cursor = connection.cursor()
@@ -77,6 +40,39 @@ def post_create():
     cursor.execute("insert into pet (name, kind, noise, food) values (?, ?, ?, ?)", (name, kind, noise, food))
     connection.commit()
 
+    return redirect(url_for("get_pets"))
+
+@app.route("/edit/<id>", methods=["GET"])
+def get_edit(id):
+    cursor = connection.cursor()
+    row = cursor.execute("select * from pet where id = ?", (id,)).fetchone()
+    pet = {
+        "id":str(row[0]),
+        "name":row[1],
+        "kind":row[2],
+        "noise":row[3],
+        "food":row[4]
+    }
+    return render_template("edit.html", pet=pet)
+
+@app.route("/edit/<id>", methods=["POST"])
+def post_edit(id):
+    name = request.form.get("name")
+    kind = request.form.get("kind")
+    noise = request.form.get("noise")
+    food = request.form.get("food")
+
+    cursor = connection.cursor()
+    cursor.execute("update pet set name = ?, kind = ?, noise = ?, food = ? where id = ?", (name, kind, noise, food, id))
+    connection.commit()
+
+    return redirect(url_for("get_pets"))
+
+@app.route("/delete/<id>", methods=["GET"])
+def get_delete(id): 
+    cursor = connection.cursor()
+    cursor.execute("delete from pet where id = ?", (id,))
+    connection.commit()
     return redirect(url_for("get_pets"))
 
 @app.route("/data", methods=["GET"])
