@@ -19,8 +19,18 @@ def retrieve_pets():
     ]
     return pet_data
 
+def test_retrieve_pets():
+    print("testing retrieve_pets...")
+    data = retrieve_pets()
+    assert type(data) == list
+    assert type(data[0]) == dict
+    for field in ["id","name","kind","noise","food"]:
+        assert field in data[0]
+        assert type(data[0][field]) == str
+
 def retrieve_pet(id):
     cursor = connection.cursor()
+    id = int(id)
     row = cursor.execute("select * from pet where id = ?", (id,)).fetchone()
     pet_item = {
         "id":str(row[0]),
@@ -31,6 +41,14 @@ def retrieve_pet(id):
     }
     return pet_item
 
+def test_retrieve_pet():
+    print("testing retrieve_pet...")
+    pets = retrieve_pets()
+    expected_pet = pets[0]
+    pet = retrieve_pet(pets[0]["id"])
+    assert pet == pets[0]
+
+
 def create_pet(pet_item):
     cursor = connection.cursor()
     cursor.execute("insert into pet (name, kind, noise, food) values (?, ?, ?, ?)", (
@@ -38,8 +56,6 @@ def create_pet(pet_item):
             pet_item["kind"], 
             pet_item["noise"], 
             pet_item["food"]))
-    connection.commit()
-
     connection.commit()
 
 def update_pet(pet_item):
@@ -57,3 +73,6 @@ def delete_pet(id):
     cursor.execute("delete from pet where id = ?", (id,))
     connection.commit()
 
+if __name__ == "__main__":
+    test_retrieve_pets()
+    test_retrieve_pet()
