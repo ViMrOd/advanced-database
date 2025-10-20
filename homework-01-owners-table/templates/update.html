@@ -1,0 +1,27 @@
+<html>
+    <head></head>
+    <body>
+        This is the update template. 
+        <form action="/update/{{data['id']}}" method="post">
+            <hr/>
+            <p>Animal Name:<input name="name" value="{{data['name']}}"/></p>
+            <p>Age:<input name="age" value="{{data['age']}}"/></p>
+	    
+            <p>Kind:<select name="type_id">
+		{% for type in types %}
+		<option value="{{type['id']}}">{{type['name']}}</option>
+		{% endfor %}
+	    </select></p>
+	    
+            <p>Owner:<select name="owner_id">
+		{% for owner in owners %}
+		<option value="{{owner['id']}}">{{owner['name']}}</option>
+		{% endfor %}
+	    </select></p>
+            <hr/>
+            <button type="submit">Update</button>
+            <a href="/list">Cancel</a>
+            <hr/>
+        </form>
+    </body>
+</html>

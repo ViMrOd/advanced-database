@@ -1,0 +1,21 @@
+<html>
+    <h3>Owner List:</h3>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Address</th>
+        </tr>
+        {% for owner in owners %}
+        <tr>
+            {% for key in owner.keys() %}
+            <td>{{ owner[key] }}</td>
+            {% endfor %}
+            <td><a href="/owner/delete/{{owner['id']}}">Delete</a></td>
+            <td><a href="/owner/update/{{owner['id']}}">Update</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <hr/>
+    <a href="/owner/create">Create New Owner</a>
+</html>
