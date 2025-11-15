@@ -1,2 +1,5 @@
 __pycache__
 /imdb
+.venv
+.DS_Store
+*.db

@@ -15,7 +15,7 @@ def get_pets():
     cursor.execute("""
         SELECT pet.id, pet.name, pet.age, owner.name as owner_name, kind.name as kind_name, kind.food, kind.sound 
         FROM pet 
-        JOIN kind ON pet.kind_id = kind.id
+        JOIN kind ON pet.kind_id = kind.idhomework-01-owners-table/database.py
         JOIN owner ON pet.owner_id = owner.id
     """)
     pets = cursor.fetchall()
