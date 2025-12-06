@@ -1,0 +1,81 @@
+explain query plan 
+SELECT l.TrackId, p.Name 
+FROM Playlist p 
+JOIN 
+PlaylistTrack l ON (p.PlaylistId || '') = (l.PlaylistId || '') 
+WHERE (l.TrackId % 502) = 0;
+
+CREATE INDEX IF NOT EXISTS idx_playlist_playlid_text ON Playlist( (PlaylistId || '') );
+CREATE INDEX IF NOT EXISTS idx_playlisttrack_playlid_text ON PlaylistTrack( (PlaylistId || '') );
+CREATE INDEX IF NOT EXISTS idx_playlisttrack_trackid ON PlaylistTrack(TrackId);
+
+DROP INDEX IF EXISTS idx_playlist_playlid_text;
+DROP INDEX IF EXISTS idx_playlisttrack_playlid_text;
+DROP INDEX IF EXISTS idx_playlisttrack_trackid;
+
+Customer -> Invoice -> InvoiceLine -> Track -> Album
+    |                                   |.       |
+    v                                   v.       v
+   Name                                Name     Name
+
+---------------------------------------------------------------------------------
+select c.FirstName || ' ' || c.LastName, t.Name, a.Title
+from 
+Customer c
+join
+Invoice on (c.CustomerId) = (Invoice.CustomerId)
+join
+InvoiceLine on (Invoice.InvoiceId) = (InvoiceLine.InvoiceId)
+join
+Track t on (InvoiceLine.TrackId)  = (t.TrackId)
+join
+Album a on (t.AlbumId) = (a.AlbumId)
+limit 40;
+
+
+select c.FirstName || ' ' || c.LastName, t.Name, a.Title
+from 
+Customer c
+join
+Invoice on (c.CustomerId || '') = (Invoice.CustomerId || '')
+join
+InvoiceLine on (Invoice.InvoiceId || '') = (InvoiceLine.InvoiceId || '')
+join
+Track t on (InvoiceLine.TrackId || '')  = (t.TrackId || '')
+join
+Album a on (t.AlbumId || '') = (a.AlbumId || '');
+
+CREATE INDEX IF NOT EXISTS idx_customer_customerid_text
+  ON Customer((CustomerId || ''));
+
+CREATE INDEX IF NOT EXISTS idx_invoice_customerid_text
+  ON Invoice((CustomerId || ''));
+
+CREATE INDEX IF NOT EXISTS idx_invoiceline_invoiceid_text
+  ON InvoiceLine((InvoiceId || ''));
+
+CREATE INDEX IF NOT EXISTS idx_invoiceline_trackid_text
+  ON InvoiceLine((TrackId || ''));
+
+CREATE INDEX IF NOT EXISTS idx_track_albumid_text
+  ON Track((AlbumId || ''));
+
+
+DROP INDEX IF EXISTS idx_customer_customerid_text;
+DROP INDEX IF EXISTS idx_invoice_customerid_text;
+DROP INDEX IF EXISTS idx_invoiceline_invoiceid_text;
+DROP INDEX IF EXISTS idx_invoiceline_trackid_text;
+DROP INDEX IF EXISTS idx_track_albumid_text;
+
+explain query plan
+select c.FirstName || ' ' || c.LastName, t.Name, a.Title
+from 
+Customer c
+join
+Invoice on (c.CustomerId || '') = (Invoice.CustomerId || '')
+join
+InvoiceLine on (Invoice.InvoiceId || '') = (InvoiceLine.InvoiceId || '')
+join
+Track t on (InvoiceLine.TrackId || '')  = (t.TrackId || '')
+join
+Album a on (t.AlbumId || '') = (a.AlbumId || '');
